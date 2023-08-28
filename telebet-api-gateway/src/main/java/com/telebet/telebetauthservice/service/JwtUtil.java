@@ -2,57 +2,75 @@ package com.telebet.telebetauthservice.service;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+
+import com.telebet.telebetauthservice.entities.UserVO;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 
-@Service
+@Component
 public class JwtUtil {
 
-	@Value("${jwt.token}")
-	private String secret;
+	//@Value("${jwt.secret}")
+	private String secret="BvPHGM8C0ia4uOuxxqPD5DTbWC9F9TWvPStp3pb7ARo0oK2mJ3pd3YG4lxA9i8bj6OTbadwezxgeEByY";
 	
-	@Value("${jwt.expiration}")
-	private String expiration;
+	//@Value("${jwt.expiration}")
+	private String expirationTime="86400";
 	
 	private Key key;
 	
-	public JwtUtil() {
+	@PostConstruct
+	public void init() {
 		this.key = Keys.hmacShaKeyFor(secret.getBytes());
 	}
 	
-	public Claims getClaims(String token) {
-		return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJwt(token).getBody();
-	}
+	public Claims getAllClaimsFromToken(String token) {
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+    }
 	
-	public Date getExpirationDate(String token) {
-		return getClaims(token).getExpiration();
-	}
+	public Date getExpirationDateFromToken(String token) {
+        return getAllClaimsFromToken(token).getExpiration();
+    }
 	
-	public String generate(String userId, String role, String tokenType) {
-		Map<String, String> claims = Map.of("id", userId, "role", role);
-		long expMillis = "ACCESS".equalsIgnoreCase(tokenType)
-				? Long.parseLong(expiration) * 1000 : Long.parseLong(expiration) * 1000 * 5;
-		
-		final Date now = new Date();
-		final Date expDate = new Date(now.getTime() * expMillis);
-		
-		return Jwts.builder()
-				.setClaims(claims)
-				.setSubject(claims.get("id"))
-				.setIssuedAt(now)
-				.setExpiration(expDate)
-				.signWith(key)
-				.compact();
-				
-	}
+	 public String generate(UserVO userVO, String type) {
+	        Map<String, Object> claims = new HashMap<>();
+	        claims.put("id", userVO.getId());
+	        claims.put("role", userVO.getRole());
+	        return doGenerateToken(claims, userVO.getEmail(), type);
+	    }
+
+	    private String doGenerateToken(Map<String, Object> claims, String username, String type) {
+	        long expirationTimeLong;
+	        if ("ACCESS".equals(type)) {
+	            expirationTimeLong = Long.parseLong(expirationTime) * 1000;
+	        } else {
+	            expirationTimeLong = Long.parseLong(expirationTime) * 1000 * 5;
+	        }
+	        final Date createdDate = new Date();
+	        final Date expirationDate = new Date(createdDate.getTime() + expirationTimeLong);
+
+	        return Jwts.builder()
+	                .setClaims(claims)
+	                .setSubject(username)
+	                .setIssuedAt(createdDate)
+	                .setExpiration(expirationDate)
+	                .signWith(key)
+	                .compact();
+	    }
 	
-	private boolean isExpired(String token) {
-		return getExpirationDate(token).before(new Date());
-	}
+	private Boolean isTokenExpired(String token) {
+        final Date expiration = getExpirationDateFromToken(token);
+        return expiration.before(new Date());
+    }
+	
+	public Boolean validateToken(String token) {
+        return !isTokenExpired(token);
+    }
 }

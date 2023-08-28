@@ -8,5 +8,5 @@ spring:
     config:
       server:
         git:
-          uri: https://config.url
+          uri: https://github.com/rajlomatech2023/telebet-casino
           clone-on-start: true  

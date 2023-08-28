@@ -1,10 +1,10 @@
 spring:
   application:
-    name: telebet-api-gateway
+    name: telebet-auth-service
     
 server:
-  port: 9001
+  port: 9004
   
 jwt:
- secret: MiAVzqUXy5Tfr1kVIGpP
+ secret: BvPHGM8C0ia4uOuxxqPD5DTbWC9F9TWvPStp3pb7ARo0oK2mJ3pd3YG4lxA9i8bj6OTbadwezxgeEByY
  expiration: 86400
