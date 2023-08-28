@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: telebet-api-gateway
+    
+server:
+  port: 9001
+  
+jwt:
+ secret: MiAVzqUXy5Tfr1kVIGpP
+ expiration: 86400

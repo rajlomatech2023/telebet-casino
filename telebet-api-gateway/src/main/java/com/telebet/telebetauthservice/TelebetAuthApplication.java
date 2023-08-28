@@ -1,13 +1,13 @@
-package com.telebet.telebetapigateway;
+package com.telebet.telebetauthservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class TelebetApiGatewayApplication {
+public class TelebetAuthApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(TelebetApiGatewayApplication.class, args);
+		SpringApplication.run(TelebetAuthApplication.class, args);
 	}
 
 }
