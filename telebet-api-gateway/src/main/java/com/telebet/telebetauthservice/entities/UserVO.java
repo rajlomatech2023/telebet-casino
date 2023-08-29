@@ -7,9 +7,9 @@ import lombok.Data;
 @AllArgsConstructor
 public class UserVO {
 
-	private String id;
+	private Long userId;
 	private String email;
-	private String name;
+	private String userName;
 	private String password;
 	private String role;
 }
