@@ -1,11 +1,10 @@
 package com.telebet.userservice.controller;
 
-import org.apache.sshd.common.config.keys.loader.openssh.kdf.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,9 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.telebet.userservice.entities.User;
-import com.telebet.userservice.repository.UserRepository;
+import com.telebet.userservice.model.Result;
 import com.telebet.userservice.service.UserService;
-import com.telebet.userservice.util.PwdEncoderUtil;
+
+import jakarta.validation.Valid;
 
 
 @RestController
@@ -28,44 +28,25 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 	
-	@Autowired(required = true)
-	private UserRepository userRepository;
-	
-	PasswordEncoder encoder = PwdEncoderUtil.getDelegatingPasswordEncoder("bcrypt");
-	
 	@PostMapping("/save")
-	public ResponseEntity<User> save(@RequestBody User userVo){
-		logger.info("userDetails {} ", userVo);
-		userVo.setPassword(encoder.encode(userVo.getPassword()));
+	public ResponseEntity<String> save(@Valid @RequestBody User userVo){
 		
-		return ResponseEntity.ok(userRepository.save(userVo));
+		String message = userService.save(userVo);
+		
+		return ResponseEntity.ok(message);
 	}
 	
 	@GetMapping("/getUserDetails")
-	public User getUser(@RequestHeader(value = "userName") String userName, @RequestHeader(value="password") String password, @RequestHeader(value = "role") String role) {
-		logger.info("in userController getUserDetails method... password {} ", password);
+	public ResponseEntity<User> getUser(@RequestHeader(value = "userName") String userName, @RequestHeader(value="password") String password, @RequestHeader(value = "role") String role) {
 		
-		User loggedInUser = userRepository.findUserByUserName(userName);
-		logger.info("logged in user details {} ", loggedInUser);
-		
-		String userPassword =encoder.encode(password); 
-		logger.info("password after encryption {} ", userPassword);
-		
-		User userVo = null;
-		
-		Boolean matches = encoder.matches(password, loggedInUser.getPassword());
-		if(matches) {
-			userVo =  userRepository.findUserByUserNameAndPassword(userName, password);
-		} else {
-			logger.info("user enter password doesn't match with db password");
-		}
-		
-		if(userVo == null) {
-			throw new RuntimeException("userNot found for the given id: "+userName);
-		}
-		
-		return userVo;
+		return new ResponseEntity<User>(userService.getUserDetails(userName, password, role), HttpStatus.OK);
 	} 
+	
+	@GetMapping("/validateUser")
+	public Result validateLoginDetails(@Valid @RequestBody User userVo){
+		
+		return userService.validateUserDetails(userVo);
+	}
 	
 	@GetMapping(value= "/secured")
 	public ResponseEntity<String> secureEndPoint() {

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import com.telebet.telebetauthservice.entities.UserVO;
+import com.telebet.telebetauthservice.model.Result;
 
 @FeignClient("user-service")
 public interface UserServiceProxy {
@@ -17,5 +18,8 @@ public interface UserServiceProxy {
 	
 	@PostMapping("/users/save")
 	public ResponseEntity<UserVO> save(@RequestBody UserVO userVo);
+	
+	@GetMapping("/validateUser")
+	public Result validateLoginDetails(@RequestBody UserVO userVo);
 
 }

@@ -33,6 +33,9 @@ public class TelebetGatewayConfig {
 				     .uri("lb://user-service"))
 				.route(r -> r.path("/telebet-auth-service/**")
 					     .uri("lb://telebet-auth-service"))
+				.route("login-service", r -> r.path("/login/**") 
+						.filters(f -> f.filter(authFilter))
+						.uri("http://192.168.0.39:8091/api/auth/signin"))
 				.build();
 		
 	}

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.telebet.telebetauthservice.entities.AuthRequest;
 import com.telebet.telebetauthservice.entities.UserVO;
+import com.telebet.telebetauthservice.model.Result;
 import com.telebet.telebetauthservice.service.AuthService;
 
 import lombok.AllArgsConstructor;
@@ -25,4 +26,9 @@ public class AuthController {
 		return ResponseEntity.ok(authService.register(request));
 	}
 	
+	@PostMapping(value = "/login")
+	public Result validateLogin(@RequestBody UserVO request){
+		
+		return authService.validateLogin(request);
+	}
 }

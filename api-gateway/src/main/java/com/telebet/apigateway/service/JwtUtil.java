@@ -15,8 +15,8 @@ import jakarta.annotation.PostConstruct;
 @Component
 public class JwtUtil {
 
-    //@Value("${jwt.secret}")
-    private String secret="BvPHGM8C0ia4uOuxxqPD5DTbWC9F9TWvPStp3pb7ARo0oK2mJ3pd3YG4lxA9i8bj6OTbadwezxgeEByY";
+    @Value("${jwt.secret}")
+    private String secret;
 
     private Key key;
 

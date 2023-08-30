@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 import com.telebet.telebetauthservice.entities.AuthRequest;
 import com.telebet.telebetauthservice.entities.AuthResponse;
 import com.telebet.telebetauthservice.entities.UserVO;
+import com.telebet.telebetauthservice.model.Result;
 import com.telebet.telebetauthservice.proxy.UserServiceProxy;
 
 import lombok.AllArgsConstructor;
@@ -46,5 +47,14 @@ public class AuthService {
 		
 		return new AuthResponse(acessToken, refreshToken);
 		
+	}
+	
+	public Result validateLogin(UserVO request) {
+		logger.info("in Auth service login method {} ", request);
+		String acessToken = jwtUtil.generate(request, "ACCESS");
+		Result result = userServiceProxy.validateLoginDetails(request);
+		result.setType("token: "+acessToken);
+		
+		return result;
 	}
 }
