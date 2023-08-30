@@ -9,4 +9,5 @@ import com.telebet.userservice.entities.User;
 public interface UserRepository extends JpaRepository<User, Long> {
 	
 	public User findUserByUserNameAndPassword(String userName, String password);
+	public User findUserByUserName(String userName);
 }

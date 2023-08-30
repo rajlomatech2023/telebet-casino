@@ -36,6 +36,7 @@ public class AuthenticationFilter implements GatewayFilter {
 		ServerHttpRequest request = exchange.getRequest();
 		
 		Logger logger = LoggerFactory.getLogger(LoggingFilter.class); 
+		logger.info("the request is -> {}", exchange.getRequest());
 		logger.info("Path of the request is -> {}", exchange.getRequest().getPath());
 		
 		if(routeValidator.isSecured.test(request)) {
@@ -63,13 +64,13 @@ public class AuthenticationFilter implements GatewayFilter {
 	}
 
 	private boolean authMissing(ServerHttpRequest request) {
-		return !request.getHeaders().containsKey("Äuthorization");
+		return !request.getHeaders().containsKey("Authorization");
 	}
 	
 	private void populateRequestWithHeaders(ServerWebExchange exchange, String token) {
         Claims claims = jwtUtils.getAllClaimsFromToken(token);
         exchange.getRequest().mutate()
-                .header("userId", String.valueOf(claims.get("userId")))
+                .header("id", String.valueOf(claims.get("id")))
                 .header("role", String.valueOf(claims.get("role")))
                 .build();
     }
