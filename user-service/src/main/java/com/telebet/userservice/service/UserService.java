@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -43,26 +44,20 @@ public class UserService {
 
 	public User getUserDetails(String userName, String password, String role) {
 		
+		User userVo = null;
 		User loggedInUser = userRepository.findUserByUserName(userName);
 		logger.info("logged in user details {} ", loggedInUser);
-		
-		//String loggedInUserPwd =passwordEncoder.encode(loggedInUser.getPassword()); 
-		//logger.info("loggedInUserPwd encoded {} ", loggedInUserPwd);
-		
-		User userVo = new User();
 		
 		boolean matches = passwordEncoder.matches(password, loggedInUser.getPassword());
 		logger.info("matches: {}"+matches);
 		
 		if(matches)
-			userVo =  userRepository.findUserByUserNameAndPassword(userName, password);
+			userVo = loggedInUser;
 		else 
 			logger.info("invalid password");
 		
 		logger.info("userVo {} ", userVo);
-		if(userVo == null) 
-			throw new UserNotFoundException("userNot found for the given id: "+userName);
-		
+				
 		return userVo;
 	}
 
