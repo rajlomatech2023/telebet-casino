@@ -17,9 +17,9 @@ public interface UserServiceProxy {
 	public UserVO getUser(@RequestHeader(value = "userName") String userName, @RequestHeader(value="password") String password); 
 	
 	@PostMapping("/users/save")
-	public ResponseEntity<UserVO> save(@RequestBody UserVO userVo);
+	public String save(@RequestBody UserVO userVo);
 	
-	@GetMapping("/validateUser")
+	@PostMapping("/users/validateUser")
 	public Result validateLoginDetails(@RequestBody UserVO userVo);
 
 }

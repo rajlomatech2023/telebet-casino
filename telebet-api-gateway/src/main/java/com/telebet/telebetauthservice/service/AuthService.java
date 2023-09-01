@@ -34,18 +34,18 @@ public class AuthService {
 		logger.info("in Auth Service register method {} ", request);
 		
 		//do validation if user exists in DB
-		request.setPassword(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt()));
+		//request.setPassword(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt()));
 		
 		//UserVO registeredUser = new RestTemplate().postForObject("http://user-service/users", request, UserVO.class);
 		
-		userServiceProxy.save(request);
+		String message = userServiceProxy.save(request);
 		
 		String acessToken = jwtUtil.generate(request, "ACCESS");
-		String refreshToken = jwtUtil.generate(request, "REFRESH");
+		//String refreshToken = jwtUtil.generate(request, "REFRESH");
 		
 		logger.info("accessToken: {} ", acessToken);
 		
-		return new AuthResponse(acessToken, refreshToken);
+		return new AuthResponse(acessToken, message);
 		
 	}
 	
@@ -53,7 +53,8 @@ public class AuthService {
 		logger.info("in Auth service login method {} ", request);
 		String acessToken = jwtUtil.generate(request, "ACCESS");
 		Result result = userServiceProxy.validateLoginDetails(request);
-		result.setType("token: "+acessToken);
+		if("1".equals(result.getResponseCode()))
+			result.setType("token: "+acessToken);
 		
 		return result;
 	}

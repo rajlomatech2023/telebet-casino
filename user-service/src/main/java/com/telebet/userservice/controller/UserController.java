@@ -29,20 +29,20 @@ public class UserController {
 	private UserService userService;
 	
 	@PostMapping("/save")
-	public ResponseEntity<String> save(@Valid @RequestBody User userVo){
+	public String save(@Valid @RequestBody User userVo){
 		
 		String message = userService.save(userVo);
 		
-		return ResponseEntity.ok(message);
+		return message;
 	}
 	
 	@GetMapping("/getUserDetails")
-	public ResponseEntity<User> getUser(@RequestHeader(value = "userName") String userName, @RequestHeader(value="password") String password, @RequestHeader(value = "role") String role) {
+	public User getUser(@RequestHeader(value = "userName") String userName, @RequestHeader(value="password") String password, @RequestHeader(value = "role") String role) {
 		
-		return new ResponseEntity<User>(userService.getUserDetails(userName, password, role), HttpStatus.OK);
+		return userService.getUserDetails(userName, password, role);
 	} 
 	
-	@GetMapping("/validateUser")
+	@PostMapping("/validateUser")
 	public Result validateLoginDetails(@Valid @RequestBody User userVo){
 		
 		return userService.validateUserDetails(userVo);

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,13 +24,13 @@ public class UserService {
 	@Autowired(required = true)
 	private UserRepository userRepository;
 	
-	private PasswordEncoder encoder = PwdEncoderUtil.getDelegatingPasswordEncoder("bcrypt");
+	private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder() ;
 	
 	//simulate save operation
 	public String save(User userVo) {
 		String message = null;
 		logger.info("userDetails {} ", userVo);
-		userVo.setPassword(encoder.encode(userVo.getPassword()));
+		userVo.setPassword(passwordEncoder.encode(userVo.getPassword()));
 		User savedUser = userRepository.save(userVo);
 		
 		if(savedUser != null)
@@ -41,22 +42,24 @@ public class UserService {
 	}
 
 	public User getUserDetails(String userName, String password, String role) {
-		logger.info("in userService getUserDetails method... password {} ", password);
 		
 		User loggedInUser = userRepository.findUserByUserName(userName);
 		logger.info("logged in user details {} ", loggedInUser);
 		
-		String userPassword =encoder.encode(password); 
-		logger.info("password after encryption {} ", userPassword);
+		//String loggedInUserPwd =passwordEncoder.encode(loggedInUser.getPassword()); 
+		//logger.info("loggedInUserPwd encoded {} ", loggedInUserPwd);
 		
-		User userVo = null;
+		User userVo = new User();
 		
-		boolean matches = encoder.matches(password, userPassword);
+		boolean matches = passwordEncoder.matches(password, loggedInUser.getPassword());
+		logger.info("matches: {}"+matches);
+		
 		if(matches)
 			userVo =  userRepository.findUserByUserNameAndPassword(userName, password);
 		else 
-			logger.info("user enter password doesn't match with db password");
+			logger.info("invalid password");
 		
+		logger.info("userVo {} ", userVo);
 		if(userVo == null) 
 			throw new UserNotFoundException("userNot found for the given id: "+userName);
 		
@@ -68,9 +71,9 @@ public class UserService {
 		User loggedInUser = userRepository.findUserByUserNameAndPassword(userVo.getUserName(), userVo.getPassword());
 		Result result = null;
 		if(loggedInUser != null) 
-			result = Result.succeed("", "", "user logged");
+			result = Result.succeed("", "1", "user logged in.");
 		else 
-			result = Result.succeed("", "", "Invalid Username or Password");
+			result = Result.succeed("", "0", "Invalid Username or Password");
 		
 		return result;
 	}
