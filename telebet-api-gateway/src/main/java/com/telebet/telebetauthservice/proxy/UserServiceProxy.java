@@ -1,7 +1,6 @@
 package com.telebet.telebetauthservice.proxy;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +16,7 @@ public interface UserServiceProxy {
 	public UserVO getUser(@RequestHeader(value = "userName") String userName, @RequestHeader(value="password") String password); 
 	
 	@PostMapping("/users/save")
-	public String save(@RequestBody UserVO userVo);
+	public Result save(@RequestBody UserVO userVo);
 	
 	@PostMapping("/users/validateUser")
 	public Result validateLoginDetails(@RequestBody UserVO userVo);

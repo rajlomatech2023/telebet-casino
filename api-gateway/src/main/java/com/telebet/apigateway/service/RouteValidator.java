@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class RouteValidator {
 
 	
-	public static final List<String> openEndPoints = List.of("/auth/register", "/auth/**");
+	public static final List<String> openEndPoints = List.of("/auth/register", "/auth/login");
 	
 	public Predicate<ServerHttpRequest> isSecured = request -> openEndPoints.stream().noneMatch(uri -> request.getURI().getPath().contains(uri));
 }

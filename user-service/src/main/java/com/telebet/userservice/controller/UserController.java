@@ -3,7 +3,6 @@ package com.telebet.userservice.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,36 +15,49 @@ import com.telebet.userservice.entities.User;
 import com.telebet.userservice.model.Result;
 import com.telebet.userservice.service.UserService;
 
-import jakarta.validation.Valid;
-
 
 @RestController
 @RequestMapping(value = "/users")
 public class UserController {
 
 	Logger logger = LoggerFactory.getLogger(UserController.class);
+	private Result result = new Result();
 	
 	@Autowired
 	private UserService userService;
 	
 	@PostMapping("/save")
-	public String save(@Valid @RequestBody User userVo){
-		
-		String message = userService.save(userVo);
-		
-		return message;
+	public Result save(@RequestBody User userVo){
+		logger.info("in usercontroller save method {}", userVo);
+		try {
+			result = userService.save(userVo);
+		} catch(Exception e) {
+			logger.error(e.getMessage());
+			result.setResponseCode("");
+			result.setResponseMessage(e.getMessage());
+			result.setResponseStatus("FAILED");
+		}
+		return result;
 	}
 	
 	@GetMapping("/getUserDetails")
 	public User getUser(@RequestHeader(value = "userName") String userName, @RequestHeader(value="password") String password, @RequestHeader(value = "role") String role) {
-		
 		return userService.getUserDetails(userName, password, role);
 	} 
 	
 	@PostMapping("/validateUser")
-	public Result validateLoginDetails(@Valid @RequestBody User userVo){
+	public Result validateLoginDetails(@RequestBody User userVo){
 		
-		return userService.validateUserDetails(userVo);
+		try {
+			logger.info("user details username {} password {} ", userVo.getUserId(), userVo.getPassword());
+			result = userService.validateUserDetails(userVo);
+		} catch(Exception e) {
+			logger.error(e.getMessage());
+			result.setResponseCode("");
+			result.setResponseMessage(e.getMessage());
+			result.setResponseStatus("FAILED");
+		}
+		return result;
 	}
 	
 	@GetMapping(value= "/secured")

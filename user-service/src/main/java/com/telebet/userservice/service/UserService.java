@@ -3,19 +3,13 @@ package com.telebet.userservice.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.telebet.userservice.entities.User;
-import com.telebet.userservice.exception.UserNotFoundException;
 import com.telebet.userservice.model.Result;
 import com.telebet.userservice.repository.UserRepository;
-import com.telebet.userservice.util.PwdEncoderUtil;
-
-import jakarta.validation.Valid;
 
 @Service
 public class UserService {
@@ -28,55 +22,77 @@ public class UserService {
 	private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder() ;
 	
 	//simulate save operation
-	public String save(User userVo) {
-		String message = null;
-		logger.info("userDetails {} ", userVo);
-		userVo.setPassword(passwordEncoder.encode(userVo.getPassword()));
-		User savedUser = userRepository.save(userVo);
+	public Result save(User userVo) {
+		Result result = new Result();
 		
-		if(savedUser != null)
-			message = "User Details Saved successfully";
-		else
-			message = "User Details not saved";
+		User loggedInUser = userRepository.findUserByUserName(userVo.getUserName());
 		
-		return message;
+		if(loggedInUser!=null) {
+			result.setResponseCode("");
+			result.setResponseMessage("User name already taken");
+			result.setResponseStatus("FAILED");
+		} else {
+			userVo.setPassword(passwordEncoder.encode(userVo.getPassword()));
+			User savedUser = userRepository.save(userVo);
+			
+			if(savedUser != null) {
+				result.setResponseCode("");
+				result.setResponseMessage("User Details Saved successfully");
+				result.setResponseStatus("SUCCESS");
+			} else {
+				result.setResponseCode("");
+				result.setResponseMessage("User Details not saved");
+				result.setResponseStatus("FAILED");
+			}
+		}
+		
+		return result;
 	}
 
 	public User getUserDetails(String userName, String password, String role) {
 		
 		User userVo = null;
+		boolean matches = false;
 		User loggedInUser = userRepository.findUserByUserName(userName);
-		logger.info("logged in user details {} ", loggedInUser);
 		
-		boolean matches = passwordEncoder.matches(password, loggedInUser.getPassword());
-		logger.info("matches: {}"+matches);
+		if(loggedInUser != null) 
+			matches = passwordEncoder.matches(password, loggedInUser.getPassword());
+		else
+			logger.info("user not available with the given username {} ", userName);
 		
-		if(matches)
-			userVo = loggedInUser;
-		else 
+		if(matches) {
+			userVo = new User();
+			userVo.setUserId(loggedInUser.getUserId());
+			userVo.setUserName(loggedInUser.getUserName());
+			userVo.setRole(loggedInUser.getRole());
+			userVo.setEmail(loggedInUser.getEmail());
+			userVo.setPassword("");
+		} else { 
 			logger.info("invalid password");
-		
-		logger.info("userVo {} ", userVo);
+		}
 				
 		return userVo;
 	}
 
-	public Result validateUserDetails(@Valid User userVo) {
+	public Result validateUserDetails(User userVo) {
 		
-		User loggedInUser = userRepository.findUserByUserNameAndPassword(userVo.getUserName(), userVo.getPassword());
-		Result result = null;
-		if(loggedInUser != null) 
-			result = Result.succeed("", "1", "user logged in.");
-		else 
-			result = Result.succeed("", "0", "Invalid Username or Password");
+		User loggedInUser = userRepository.findUserByUserName(userVo.getUserName());
+		
+		boolean matches = passwordEncoder.matches(userVo.getPassword(), loggedInUser.getPassword());
+		
+		Result result = new Result();
+		
+		if(!matches) { 
+			result.setResponseCode("0");
+			result.setResponseMessage("Invalid Username or Password");
+			result.setResponseStatus("FAILED");
+		} else {
+			result.setResponseCode("1");
+			result.setResponseMessage("User logged in successfully");
+			result.setResponseStatus("SUCCESS");
+		}
 		
 		return result;
 	}
-	
-	
-	
-	
-	
-	
 
 }
