@@ -16,14 +16,23 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+import com.lomatech.telebetwebsocketclient.service.MessageHandler;
+
+@Component
 @ClientEndpoint
 public class TelebetWebSocketClient {
 	
-	private static final String URI = "ws://room.fxdd6678.cc/ws/room/1-101-939-13/c43f826d-b45a-47dc-824d-57a38b4ec55c";
+	//@Value("${telebet.ws.url}")
+	//private String URI;
+	private String URI = "ws://room.fxdd6678.cc/ws/room/1-101-929-13/b8876dd1-738d-4f70-9230-ab295f4fab9d";
 	
 	private Session session;
 	
+	@Autowired
 	private MessageHandler messageHandler;
 	
 	public TelebetWebSocketClient() {
@@ -38,19 +47,20 @@ public class TelebetWebSocketClient {
 	
 	@OnOpen
 	public void onOpen(Session session, EndpointConfig endpointConfig) {
-		System.out.println("hi in onOpen() method...");
+		//System.out.println("hi in onOpen() method...");
 		this.session = session;
 	}
 	
 	@OnClose
 	public void onClose(Session session, CloseReason closeReason) {
-		System.out.println("in onClose() method..");
+		//System.out.println("in onClose() method..");
 		this.session = null;
 	}
 	
 	@OnMessage
 	public void onMessage(String message) {
-		System.out.println("hi in onMessage() method...");
+		//System.out.println("hi in onMessage() method...");
+		System.out.println("ws url: "+URI);
 		if(this.messageHandler != null) {
 			this.messageHandler.handleMessage(message);
 		}
@@ -73,9 +83,4 @@ public class TelebetWebSocketClient {
 		}
 	}
 	
-	public static interface MessageHandler {
-
-        public void handleMessage(String message);
-    }
-
 }

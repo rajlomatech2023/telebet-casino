@@ -3,7 +3,7 @@ package com.lomatech.telebetwebsocketclient.service;
 import org.springframework.stereotype.Component;
 
 @Component
-public interface MessageHandler {
+public interface TelebetKafkaProducerService {
 
-    public void handleMessage(String message);
+	public String sendCardDetails(String message);
 }
