@@ -6,10 +6,17 @@ import lombok.Data;
 public class AuthResponse {
 
 	private String accessToken;
-	private String refreshToken;
+	private String message;
+	private String status;
+	private String responseCode;
 	
-	public AuthResponse(String accessToken, String refreshToken) {
-		this.accessToken = accessToken;
-		this.refreshToken = refreshToken;
+	public AuthResponse() {
+	}
+	
+	public AuthResponse(String message, String status, String token, String responseCode) {
+		this.message = message;
+		this.status = status;
+		this.accessToken = token;
+		this.responseCode = responseCode;
 	}
 }

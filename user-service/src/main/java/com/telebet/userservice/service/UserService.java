@@ -7,6 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.telebet.userservice.entities.AuthResponse;
 import com.telebet.userservice.entities.User;
 import com.telebet.userservice.model.Result;
 import com.telebet.userservice.repository.UserRepository;
@@ -74,22 +75,22 @@ public class UserService {
 		return userVo;
 	}
 
-	public Result validateUserDetails(User userVo) {
+	public AuthResponse validateUserDetails(User userVo) {
 		
 		User loggedInUser = userRepository.findUserByUserName(userVo.getUserName());
 		
 		boolean matches = passwordEncoder.matches(userVo.getPassword(), loggedInUser.getPassword());
 		
-		Result result = new Result();
+		AuthResponse result = new AuthResponse();
 		
 		if(!matches) { 
 			result.setResponseCode("0");
-			result.setResponseMessage("Invalid Username or Password");
-			result.setResponseStatus("FAILED");
+			result.setMessage("Invalid Username or Password");
+			result.setStatus("FAILED");
 		} else {
 			result.setResponseCode("1");
-			result.setResponseMessage("User logged in successfully");
-			result.setResponseStatus("SUCCESS");
+			result.setMessage("User logged in successfully");
+			result.setStatus("SUCCESS");
 		}
 		
 		return result;

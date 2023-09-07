@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.telebet.telebetauthservice.entities.AuthResponse;
 import com.telebet.telebetauthservice.entities.UserVO;
 import com.telebet.telebetauthservice.model.Result;
 import com.telebet.telebetauthservice.service.AuthService;
@@ -47,7 +48,7 @@ public class AuthController {
 	}
 	
 	@PostMapping(value = "/login")
-	public Result validateLogin(@RequestBody UserVO request){
+	public AuthResponse validateLogin(@RequestBody UserVO request){
 		
 		return authService.validateLogin(request);
 	}

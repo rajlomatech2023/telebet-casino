@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.telebet.userservice.entities.AuthResponse;
 import com.telebet.userservice.entities.User;
 import com.telebet.userservice.model.Result;
 import com.telebet.userservice.service.UserService;
@@ -46,18 +47,18 @@ public class UserController {
 	} 
 	
 	@PostMapping("/validateUser")
-	public Result validateLoginDetails(@RequestBody User userVo){
-		
+	public AuthResponse validateLoginDetails(@RequestBody User userVo){
+		AuthResponse response = new AuthResponse();
 		try {
 			logger.info("user details username {} password {} ", userVo.getUserId(), userVo.getPassword());
-			result = userService.validateUserDetails(userVo);
+			response = userService.validateUserDetails(userVo);
 		} catch(Exception e) {
 			logger.error(e.getMessage());
-			result.setResponseCode("");
-			result.setResponseMessage(e.getMessage());
-			result.setResponseStatus("FAILED");
+			response.setAccessToken("");
+			response.setMessage(e.getMessage());
+			response.setStatus("FAILED");
 		}
-		return result;
+		return response;
 	}
 	
 	@GetMapping(value= "/secured")

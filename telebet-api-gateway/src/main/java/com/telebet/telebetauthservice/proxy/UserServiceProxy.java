@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
+import com.telebet.telebetauthservice.entities.AuthResponse;
 import com.telebet.telebetauthservice.entities.UserVO;
 import com.telebet.telebetauthservice.model.Result;
 
@@ -19,6 +20,6 @@ public interface UserServiceProxy {
 	public Result save(@RequestBody UserVO userVo);
 	
 	@PostMapping("/users/validateUser")
-	public Result validateLoginDetails(@RequestBody UserVO userVo);
+	public AuthResponse validateLoginDetails(@RequestBody UserVO userVo);
 
 }
